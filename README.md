@@ -3,7 +3,7 @@
 On this project the AlexNet Convolution Neural Network is trained using traffic sign images from the German Road Traffic Sign Benchmark.
 The initially trained network is then quantized/optimized for deployment on mobile devices using TensorFlow Lite 
 
-#Project key Steps
+## Project key Steps
 
 1. Download German Traffic Sign Benchmark training images [from here](http://benchmark.ini.rub.de/Dataset/GTSRB_Final_Training_Images.zip)
 2. Convert from .ppm to .jpg format
