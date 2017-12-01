@@ -1,0 +1,267 @@
+========== RESTART: /home/olu/Dev/scratch_train_sign/create_imdb.py ==========
+Result will be saved to /home/olu/Dev/data_base/sign_base/output
+Determining list of input files and labels from /home/olu/Dev/data_base/sign_base/labels.txt 
+File path /home/olu/Dev/data_base/sign_base/training/speed_20/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/speed_30/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/speed_50/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/speed_60/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/speed_70/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/speed_80/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/speed_less_80/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/speed_100/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/speed_120/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/no_car_overtaking/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/no_truck_overtaking/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/priority_road/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/priority_road_2/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/yield_right_of_way/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/stop/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/road_closed/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/maximum_weight_allowed/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/entry_prohibited/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/danger/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/curve_left/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/curve_right/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/double_curve_right/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/rough_road/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/slippery_road/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/road_narrows_right/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/work_in_progress/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/traffic_light_ahead/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/pedestrian_crosswalk/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/children_area/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/bicycle_crossing/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/beware_of_ice/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/wild_animal_crossing/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/end_of_restriction/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/must_turn_right/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/must_turn_left/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/must_go_straight/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/must_go_straight_or_right/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/must_go_straight_or_left/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/mandatroy_direction_bypass_obstacle/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/mandatroy_direction_bypass_obstacle2/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/traffic_circle/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/end_of_no_car_overtaking/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/end_of_no_truck_overtaking/* 
+
+Found 39209 JPEG files across 43 labels inside /home/olu/Dev/data_base/sign_base/training
+Launching 2 threads for spacings: [[0, 19604], [19604, 39209]]
+2017-12-01 15:56:39.543697 [thread 1]: Processed 1000 of 19605 images in thread batch.2017-12-01 15:56:39.545929 [thread 0]: Processed 1000 of 19604 images in thread batch.
+
+2017-12-01 15:56:44.254576 [thread 0]: Processed 2000 of 19604 images in thread batch.
+2017-12-01 15:56:44.433656 [thread 1]: Processed 2000 of 19605 images in thread batch.
+2017-12-01 15:56:48.754633 [thread 0]: Processed 3000 of 19604 images in thread batch.
+2017-12-01 15:56:49.798092 [thread 1]: Processed 3000 of 19605 images in thread batch.
+2017-12-01 15:56:53.908201 [thread 0]: Processed 4000 of 19604 images in thread batch.
+2017-12-01 15:56:54.351327 [thread 1]: Processed 4000 of 19605 images in thread batch.
+2017-12-01 15:56:58.855722 [thread 0]: Processed 5000 of 19604 images in thread batch.
+2017-12-01 15:56:59.301768 [thread 1]: Processed 5000 of 19605 images in thread batch.
+2017-12-01 15:57:03.704445 [thread 0]: Processed 6000 of 19604 images in thread batch.
+2017-12-01 15:57:04.144965 [thread 1]: Processed 6000 of 19605 images in thread batch.
+2017-12-01 15:57:08.543383 [thread 0]: Processed 7000 of 19604 images in thread batch.
+2017-12-01 15:57:09.007709 [thread 1]: Processed 7000 of 19605 images in thread batch.
+2017-12-01 15:57:13.622921 [thread 0]: Processed 8000 of 19604 images in thread batch.
+2017-12-01 15:57:14.059550 [thread 1]: Processed 8000 of 19605 images in thread batch.
+2017-12-01 15:57:18.477144 [thread 0]: Processed 9000 of 19604 images in thread batch.
+2017-12-01 15:57:18.811312 [thread 1]: Processed 9000 of 19605 images in thread batch.
+2017-12-01 15:57:23.763258 [thread 0]: Processed 10000 of 19604 images in thread batch.
+2017-12-01 15:57:24.086001 [thread 1]: Processed 10000 of 19605 images in thread batch.
+2017-12-01 15:57:28.965086 [thread 0]: Processed 11000 of 19604 images in thread batch.
+2017-12-01 15:57:29.261494 [thread 1]: Processed 11000 of 19605 images in thread batch.
+2017-12-01 15:57:34.061319 [thread 0]: Processed 12000 of 19604 images in thread batch.
+2017-12-01 15:57:34.177079 [thread 1]: Processed 12000 of 19605 images in thread batch.
+2017-12-01 15:57:39.415580 [thread 1]: Processed 13000 of 19605 images in thread batch.2017-12-01 15:57:39.418505 [thread 0]: Processed 13000 of 19604 images in thread batch.
+
+2017-12-01 15:57:44.575577 [thread 1]: Processed 14000 of 19605 images in thread batch.
+2017-12-01 15:57:44.973289 [thread 0]: Processed 14000 of 19604 images in thread batch.
+2017-12-01 15:57:49.592148 [thread 1]: Processed 15000 of 19605 images in thread batch.
+2017-12-01 15:57:50.393305 [thread 0]: Processed 15000 of 19604 images in thread batch.
+2017-12-01 15:57:54.668816 [thread 1]: Processed 16000 of 19605 images in thread batch.
+2017-12-01 15:57:55.473357 [thread 0]: Processed 16000 of 19604 images in thread batch.
+2017-12-01 15:57:59.705012 [thread 1]: Processed 17000 of 19605 images in thread batch.
+2017-12-01 15:58:00.571395 [thread 0]: Processed 17000 of 19604 images in thread batch.
+2017-12-01 15:58:04.590437 [thread 1]: Processed 18000 of 19605 images in thread batch.
+2017-12-01 15:58:05.412019 [thread 0]: Processed 18000 of 19604 images in thread batch.
+2017-12-01 15:58:09.393710 [thread 1]: Processed 19000 of 19605 images in thread batch.
+2017-12-01 15:58:10.293427 [thread 0]: Processed 19000 of 19604 images in thread batch.
+2017-12-01 15:58:12.288467 [thread 1]: Wrote 19605 images to /home/olu/Dev/data_base/sign_base/output/validation-00001-of-00002
+2017-12-01 15:58:12.326821 [thread 1]: Wrote 19605 images to 19605 shards.
+2017-12-01 15:58:12.793973 [thread 0]: Wrote 19604 images to /home/olu/Dev/data_base/sign_base/output/validation-00000-of-00002
+2017-12-01 15:58:12.840278 [thread 0]: Wrote 19604 images to 19604 shards.
+2017-12-01 15:58:13.796779: Finished writing all 39209 images in data set.
+Determining list of input files and labels from /home/olu/Dev/data_base/sign_base/labels.txt 
+File path /home/olu/Dev/data_base/sign_base/training/speed_20/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/speed_30/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/speed_50/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/speed_60/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/speed_70/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/speed_80/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/speed_less_80/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/speed_100/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/speed_120/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/no_car_overtaking/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/no_truck_overtaking/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/priority_road/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/priority_road_2/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/yield_right_of_way/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/stop/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/road_closed/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/maximum_weight_allowed/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/entry_prohibited/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/danger/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/curve_left/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/curve_right/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/double_curve_right/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/rough_road/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/slippery_road/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/road_narrows_right/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/work_in_progress/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/traffic_light_ahead/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/pedestrian_crosswalk/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/children_area/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/bicycle_crossing/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/beware_of_ice/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/wild_animal_crossing/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/end_of_restriction/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/must_turn_right/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/must_turn_left/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/must_go_straight/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/must_go_straight_or_right/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/must_go_straight_or_left/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/mandatroy_direction_bypass_obstacle/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/mandatroy_direction_bypass_obstacle2/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/traffic_circle/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/end_of_no_car_overtaking/* 
+
+File path /home/olu/Dev/data_base/sign_base/training/end_of_no_truck_overtaking/* 
+
+Found 39209 JPEG files across 43 labels inside /home/olu/Dev/data_base/sign_base/training
+Launching 2 threads for spacings: [[0, 19604], [19604, 39209]]
+2017-12-01 15:58:19.321528 [thread 1]: Processed 1000 of 19605 images in thread batch.2017-12-01 15:58:19.328218 [thread 0]: Processed 1000 of 19604 images in thread batch.
+
+2017-12-01 15:58:24.103518 [thread 1]: Processed 2000 of 19605 images in thread batch.
+2017-12-01 15:58:24.379995 [thread 0]: Processed 2000 of 19604 images in thread batch.
+2017-12-01 15:58:28.848063 [thread 1]: Processed 3000 of 19605 images in thread batch.
+2017-12-01 15:58:29.290989 [thread 0]: Processed 3000 of 19604 images in thread batch.
+2017-12-01 15:58:33.692279 [thread 1]: Processed 4000 of 19605 images in thread batch.
+2017-12-01 15:58:34.348252 [thread 0]: Processed 4000 of 19604 images in thread batch.
+2017-12-01 15:58:38.885082 [thread 1]: Processed 5000 of 19605 images in thread batch.
+2017-12-01 15:58:39.212437 [thread 0]: Processed 5000 of 19604 images in thread batch.
+2017-12-01 15:58:44.014678 [thread 1]: Processed 6000 of 19605 images in thread batch.
+2017-12-01 15:58:44.319710 [thread 0]: Processed 6000 of 19604 images in thread batch.
+2017-12-01 15:58:48.727675 [thread 1]: Processed 7000 of 19605 images in thread batch.
+2017-12-01 15:58:49.454886 [thread 0]: Processed 7000 of 19604 images in thread batch.
+2017-12-01 15:58:53.757572 [thread 1]: Processed 8000 of 19605 images in thread batch.
+2017-12-01 15:58:54.732761 [thread 0]: Processed 8000 of 19604 images in thread batch.
+2017-12-01 15:58:59.082209 [thread 1]: Processed 9000 of 19605 images in thread batch.
+2017-12-01 15:58:59.685727 [thread 0]: Processed 9000 of 19604 images in thread batch.
+2017-12-01 15:59:03.855798 [thread 1]: Processed 10000 of 19605 images in thread batch.
+2017-12-01 15:59:04.623629 [thread 0]: Processed 10000 of 19604 images in thread batch.
+2017-12-01 15:59:08.897193 [thread 1]: Processed 11000 of 19605 images in thread batch.
+2017-12-01 15:59:09.754831 [thread 0]: Processed 11000 of 19604 images in thread batch.
+2017-12-01 15:59:13.925373 [thread 1]: Processed 12000 of 19605 images in thread batch.
+2017-12-01 15:59:14.625715 [thread 0]: Processed 12000 of 19604 images in thread batch.
+2017-12-01 15:59:18.758661 [thread 1]: Processed 13000 of 19605 images in thread batch.
+2017-12-01 15:59:19.334345 [thread 0]: Processed 13000 of 19604 images in thread batch.
+2017-12-01 15:59:23.557197 [thread 1]: Processed 14000 of 19605 images in thread batch.
+2017-12-01 15:59:24.091283 [thread 0]: Processed 14000 of 19604 images in thread batch.
+2017-12-01 15:59:28.380125 [thread 1]: Processed 15000 of 19605 images in thread batch.
+2017-12-01 15:59:28.939316 [thread 0]: Processed 15000 of 19604 images in thread batch.
+2017-12-01 15:59:33.511671 [thread 1]: Processed 16000 of 19605 images in thread batch.
+2017-12-01 15:59:33.791349 [thread 0]: Processed 16000 of 19604 images in thread batch.
+2017-12-01 15:59:38.410925 [thread 1]: Processed 17000 of 19605 images in thread batch.
+2017-12-01 15:59:38.555400 [thread 0]: Processed 17000 of 19604 images in thread batch.
+2017-12-01 15:59:43.261218 [thread 1]: Processed 18000 of 19605 images in thread batch.
+2017-12-01 15:59:43.384039 [thread 0]: Processed 18000 of 19604 images in thread batch.
+2017-12-01 15:59:48.125398 [thread 1]: Processed 19000 of 19605 images in thread batch.
+2017-12-01 15:59:48.189964 [thread 0]: Processed 19000 of 19604 images in thread batch.
+2017-12-01 15:59:50.915470 [thread 1]: Wrote 19605 images to /home/olu/Dev/data_base/sign_base/output/train-00001-of-00002
+2017-12-01 15:59:50.925460 [thread 1]: Wrote 19605 images to 19605 shards.
+2017-12-01 15:59:51.064479 [thread 0]: Wrote 19604 images to /home/olu/Dev/data_base/sign_base/output/train-00000-of-00002
+2017-12-01 15:59:51.069508 [thread 0]: Wrote 19604 images to 19604 shards.
+2017-12-01 15:59:51.536970: Finished writing all 39209 images in data set.
+>>> 
