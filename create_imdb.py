@@ -53,6 +53,8 @@ from __future__ import division
 from __future__ import print_function
 
 from datetime import datetime
+from PIL import Image
+from time import sleep
 import os
 import random
 import sys
@@ -67,13 +69,15 @@ import tensorflow as tf
 
 # SETTING SOME GLOBAL DATA
 """-------------------------------------------------------------------------------------------------------------------------------------------------------"""
-tf.app.flags.DEFINE_string('train_directory', '/home/olu/Dev/data_base/sign_base/training', 'Training data directory')
-tf.app.flags.DEFINE_string('validation_directory', '/home/olu/Dev/data_base/sign_base/training', 'Validation data directory')
-tf.app.flags.DEFINE_string('output_directory', '/home/olu/Dev/data_base/sign_base/output', 'Output data directory')
+tf.app.flags.DEFINE_string('train_directory', '/home/olu/Dev/data_base/sign_base/training_(227x227)', 'Training data directory')
+tf.app.flags.DEFINE_string('validation_directory', '/home/olu/Dev/data_base/sign_base/training_(227x227)', 'Validation data directory')
+tf.app.flags.DEFINE_string('output_directory', '/home/olu/Dev/data_base/sign_base/output/TFRecord_(227x227)', 'Output data directory')
 tf.app.flags.DEFINE_integer('train_shards', 2, 'Number of shards in training TFRecord files.')
 tf.app.flags.DEFINE_integer('validation_shards', 2, 'Number of shards in validation TFRecord files.')
 tf.app.flags.DEFINE_integer('num_threads', 2, 'Number of threads to preprocess the images.')
 tf.app.flags.DEFINE_string('labels_file', '/home/olu/Dev/data_base/sign_base/labels.txt', 'Labels_file.txt')
+tf.app.flags.DEFINE_integer("image_height", 227, "Height of the output image after crop and resize.") #Alexnet takes 227 x 227 image input
+tf.app.flags.DEFINE_integer("image_width", 227, "Width of the output image after crop and resize.")
 FLAGS = tf.app.flags.FLAGS
 """ The labels file contains a list of valid labels are held in this file. The file contains entries such as:
         speed_100
@@ -81,6 +85,8 @@ FLAGS = tf.app.flags.FLAGS
         no_car_overtaking
         no_truck_overtaking
     Each line corresponds to a label, and each label (per line) is mapped to an integer corresponding to the line number starting from 0.
+
+
 -------------------------------------------------------------------------------------------------------------------------------------------------------"""
 
 
@@ -189,9 +195,26 @@ def _process_image(filename, coder):
     height: integer, image height in pixels.
     width: integer, image width in pixels.
   """
+  #Resize image to networks input size
+  size=(FLAGS.image_height, FLAGS.image_width)
+  original_image = Image.open(filename)
+  width, height = original_image.size
+  #print('The original image size is {wide} wide x {height} high'.format(wide=width, height=height))
+  
+  resized_image = original_image.resize(size)
+  width, height = resized_image.size
+  #print('The resized image size is {wide} wide x {height} high'.format(wide=width, height=height))
+  #resized_image.show()
+  resized_image.save(filename)
+
+
+  #Sleep a bit before file is re-read 5 milliseconds
+  sleep(0.005)
+  
   # Read the image file.
   with tf.gfile.FastGFile(filename, 'rb') as f:
     image_data = f.read()
+    
 
   # Convert any PNG to JPEG's for consistency.
   if _is_png(filename):
@@ -206,7 +229,6 @@ def _process_image(filename, coder):
   height = image.shape[0]
   width = image.shape[1]
   assert image.shape[2] == 3
-
   return image_data, height, width
 """-------------------------------------------------------------------------------------------------------------------------------------------------------"""
 

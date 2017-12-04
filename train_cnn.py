@@ -23,7 +23,7 @@ import os               # path join
 
 # SETTING SOME GLOBAL VARIABLES
 """-------------------------------------------------------------------------------------------------------------------------------------------------------"""
-DATA_DIR = "/home/olu/Dev/data_base/sign_base/output"
+DATA_DIR = "/home/olu/Dev/data_base/sign_base/output/TFRecord_(227x227)"
 TRAINING_SET_SIZE = 39209
 BATCH_SIZE = 30
 IMAGE_SIZE = 227
@@ -57,6 +57,8 @@ class _image_object:
 """-------------------------------------------------------------------------------------------------------------------------------------------------------"""
 
 
+#READ EXAMPLE PROTOS FROM TFRECORD AND EXTRACT NEEDED INFORMATION
+"""-------------------------------------------------------------------------------------------------------------------------------------------------------"""
 def read_and_decode(filename_queue):
     reader = tf.TFRecordReader()
     _, serialized_example = reader.read(filename_queue)
@@ -70,11 +72,13 @@ def read_and_decode(filename_queue):
     image_raw = tf.image.decode_jpeg(image_encoded, channels=3)
     image_object = _image_object()
     image_object.image = tf.image.resize_image_with_crop_or_pad(image_raw, IMAGE_SIZE_X, IMAGE_SIZE_Y)
-    image_object.height = IMAGE_SIZE_X #features["image/height"]
-    image_object.width = IMAGE_SIZE_Y #features["image/width"]
+    image_object.height = features["image/height"]
+    image_object.width = features["image/width"]
     image_object.filename = features["image/filename"]
     image_object.label = tf.cast(features["image/class/label"], tf.int64)
     return image_object
+"""-------------------------------------------------------------------------------------------------------------------------------------------------------"""
+
 
 def flower_input(if_random = True, if_training = True):
     if(if_training):
@@ -190,7 +194,7 @@ def flower_inference(image_batch):
 def flower_train():
     image_batch_out, label_batch_out, filename_batch = flower_input(if_random = False, if_training = True)
 
-    image_batch_placeholder = tf.placeholder(tf.float32, shape=[BATCH_SIZE, 227, 227, 3])
+    image_batch_placeholder = tf.placeholder(tf.float32, shape=[BATCH_SIZE, IMAGE_SIZE_X, IMAGE_SIZE_Y, 3])
     image_batch = tf.reshape(image_batch_out, (BATCH_SIZE, IMAGE_SIZE, IMAGE_SIZE, 3))
 
     label_batch_placeholder = tf.placeholder(tf.float32, shape=[BATCH_SIZE, 5])
