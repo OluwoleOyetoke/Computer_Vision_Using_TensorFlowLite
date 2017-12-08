@@ -4,6 +4,11 @@ REFERENCE:
 Code adapted from Google Tensor FLow Git Hub Repositiory:
 https://github.com/tensorflow/models/blob/f87a58cd96d45de73c9a8330a06b2ab56749a7fa/research/inception/inception/data/build_image_data.py 
 
+    @author: Oluwole Oyetoke
+    @date: 5th December, 2017
+    @langauge: Python/TF
+    @email: oluwoleoyetoke@gmail.com
+
 INTRODUCTION:
 -------------
 Converts image dataset to a sharded dataset. The sharded dataset consists of Tensor Flow Records Format (TFRecords) and with Example protos.
@@ -69,9 +74,9 @@ import tensorflow as tf
 
 # SETTING SOME GLOBAL DATA
 """-------------------------------------------------------------------------------------------------------------------------------------------------------"""
-tf.app.flags.DEFINE_string('train_directory', '/home/olu/Dev/data_base/sign_base/training_(227x227)', 'Training data directory')
-tf.app.flags.DEFINE_string('validation_directory', '/home/olu/Dev/data_base/sign_base/training_(227x227)', 'Validation data directory')
-tf.app.flags.DEFINE_string('output_directory', '/home/olu/Dev/data_base/sign_base/output/TFRecord_(227x227)', 'Output data directory')
+tf.app.flags.DEFINE_string('train_directory', '/home/olu/Dev/data_base/sign_base/training_227x227', 'Training data directory')
+tf.app.flags.DEFINE_string('validation_directory', '/home/olu/Dev/data_base/sign_base/training_227x227', 'Validation data directory')
+tf.app.flags.DEFINE_string('output_directory', '/home/olu/Dev/data_base/sign_base/output/TFRecord_227x227', 'Output data directory')
 tf.app.flags.DEFINE_integer('train_shards', 2, 'Number of shards in training TFRecord files.')
 tf.app.flags.DEFINE_integer('validation_shards', 2, 'Number of shards in validation TFRecord files.')
 tf.app.flags.DEFINE_integer('num_threads', 2, 'Number of threads to preprocess the images.')
@@ -106,9 +111,10 @@ def _bytes_feature(value):
 
 
 
+
 #FUNCTION FOR BUILDING A PROTO
 """-------------------------------------------------------------------------------------------------------------------------------------------------------"""
-def _convert_to_example(filename, image_buffer, label, text, height, width):
+def _convert_to_example(filename, image_buffer, label, text, shape_buffer):
   """Build an Example proto for an example.
   Args:
     filename: string, path to an image file, e.g., '/path/to/example.JPG'
@@ -124,17 +130,13 @@ def _convert_to_example(filename, image_buffer, label, text, height, width):
   colorspace = 'RGB'
   channels = 3
   image_format = 'JPEG'
-
+  #Save TFrecord containing image_bytes, shape [337,337,3], label, text, filename
   example = tf.train.Example(features=tf.train.Features(feature={
-      'image/height': _int64_feature(height),
-      'image/width': _int64_feature(width),
-      'image/colorspace': _bytes_feature(tf.compat.as_bytes(colorspace)),
-      'image/channels': _int64_feature(channels),
+      'image/shape': _bytes_feature(shape_buffer), 
       'image/class/label': _int64_feature(label),
       'image/class/text': _bytes_feature(tf.compat.as_bytes(text)),
-      'image/format': _bytes_feature(tf.compat.as_bytes(image_format)),
       'image/filename': _bytes_feature(tf.compat.as_bytes(os.path.basename(filename))),
-      'image/encoded': _bytes_feature(tf.compat.as_bytes(image_buffer))}))
+      'image/encoded': _bytes_feature(image_buffer)}))
   return example
 """-------------------------------------------------------------------------------------------------------------------------------------------------------"""
 
@@ -204,13 +206,19 @@ def _process_image(filename, coder):
   resized_image = original_image.resize(size)
   width, height = resized_image.size
   #print('The resized image size is {wide} wide x {height} high'.format(wide=width, height=height))
-  #resized_image.show()
   resized_image.save(filename)
 
 
   #Sleep a bit before file is re-read 5 milliseconds
   sleep(0.005)
+
+  #ensure that all dataset images have been conveted to .jpeg
+  image = np.asarray(original_image, np.uint8) #get image data
+  shape = np.array(image.shape, np.int32) #get image shape
+  shape_data = shape.tobytes() #convert image shape to bytes
+  image_data = image.tobytes() # convert image to raw data bytes in the array.
   
+  """ ANOTHER METHOD
   # Read the image file.
   with tf.gfile.FastGFile(filename, 'rb') as f:
     image_data = f.read()
@@ -228,8 +236,8 @@ def _process_image(filename, coder):
   assert len(image.shape) == 3
   height = image.shape[0]
   width = image.shape[1]
-  assert image.shape[2] == 3
-  return image_data, height, width
+  assert image.shape[2] == 3"""
+  return image_data, shape_data
 """-------------------------------------------------------------------------------------------------------------------------------------------------------"""
 
 
@@ -279,14 +287,15 @@ def _process_image_files_batch(coder, thread_index, ranges, name, filenames,
       text = texts[i]
 
       try:
-        image_buffer, height, width = _process_image(filename, coder)
+       # image_buffer, height, width = _process_image(filename, coder)
+        image_buffer, shape_buffer = _process_image(filename, coder)
       except Exception as e:
         print(e)
         print('SKIPPED: Unexpected eror while decoding %s.' % filename)
         continue
 
       example = _convert_to_example(filename, image_buffer, label,
-                                    text, height, width)
+                                    text, shape_buffer)
       writer.write(example.SerializeToString())
       shard_counter += 1
       counter += 1
@@ -425,7 +434,6 @@ def _find_image_files(data_dir, labels_file):
         (len(filenames), len(unique_labels), data_dir))
   return filenames, texts, labels
 """-------------------------------------------------------------------------------------------------------------------------------------------------------"""
-
 
 
 
