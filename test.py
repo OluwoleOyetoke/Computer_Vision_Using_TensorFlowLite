@@ -2,6 +2,7 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
+from sklearn.model_selection import train_test_split
 
 #import Image
 import math
@@ -51,9 +52,7 @@ def main(unused_argv):
     num_of_epochs=1
     
     #Directory path to the '.tfrecord' files
-    #filenames = ["/home/olu/Dev/data_base/sign_base/output/TFRecord_227x227/train-00000-of-00002", "/home/olu/Dev/data_base/sign_base/output/TFRecord_227x227/train-00001-of-00002"]
-    filenames = ["C:/Users/Oluwole_Jnr/Desktop/Mobile Accelerated Vision App Project/TFRecord_227x227/train-00001-of-00002"]
-    #"C:/Users/Oluwole_Jnr/Desktop/Mobile Accelerated Vision App Project/TFRecord_227x227/train-00001-of-00002"]
+    filenames = ["/home/olu/Dev/data_base/sign_base/output/TFRecord_227x227/train-00000-of-00002", "/home/olu/Dev/data_base/sign_base/output/TFRecord_227x227/train-00001-of-00002"]
 
 
     print("GETTING RECORD COUNT")
@@ -67,6 +66,7 @@ def main(unused_argv):
  
     dataset = tf.data.TFRecordDataset(filenames=filenames)
     dataset = dataset.map(_process_dataset)                     #Get all content of dataset
+    dataset = dataset.shuffle(buffer_size=1000)                 #Shuffle selection from the dataset
     dataset = dataset.repeat(repeat_count)                      #Repeats dataset this # times
     dataset = dataset.batch(batch_size)                         #Batch size to use
     iterator = dataset.make_initializable_iterator()            #Create iterator which helps to get all iamges in the dataset
@@ -77,10 +77,12 @@ def main(unused_argv):
     sess = tf.Session()
     print("Total number of strides needed to stream through dataset: ~%i" %no_of_rounds) 
   
-    count=1
-    for _ in range(num_of_epochs):
+    
+    for _ in range(2):
       sess.run(iterator.initializer)
-      
+      count=0
+      complete_evaluation_image_set = np.array([])
+      complete_evaluation_label_set = np.array([])
       while True:
         try:
           print("Now evaluating tensors for stride %i out of %i" % (count, no_of_rounds))
@@ -91,11 +93,18 @@ def main(unused_argv):
           #squeeze np array to make dimesnsions appropriate
           squeezed_label_np_array = label_np_array.squeeze()
           squeezed_image_np_array = image_np_array.squeeze()
+          #Split data into training and testing data
+          image_train, image_test, label_train, label_test = train_test_split(squeezed_image_np_array, squeezed_label_np_array, test_size=0.010, random_state=42, shuffle=True)
+          #Store evaluation data in its place
+          complete_evaluation_image_set = np.append(complete_evaluation_image_set, image_test)
+          complete_evaluation_label_set = np.append(complete_evaluation_label_set, label_test)
           #Feed current batch to TF Estimator for training
         except tf.errors.OutOfRangeError:
           print("End of Dataset Reached")
           break
         count=count+1
+      print(complete_evaluation_label_set.shape)
+      print(complete_evaluation_image_set.shape)
     sess.close()
 
     print("End of Training")
