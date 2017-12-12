@@ -8,8 +8,9 @@ from sklearn.model_selection import train_test_split
 import math
 import numpy as np
 import tensorflow as tf
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 import os
+import time
 
 def _int64_feature(value):
   return tf.train.Feature(int64_list=tf.train.Int64List(value=[value]))
@@ -43,6 +44,8 @@ def _process_dataset(serialized):
 
 #MAIN FUNCTION
 def main(unused_argv):
+
+    
     print("STARTED\n\n")
 
     #Declare needed variables
