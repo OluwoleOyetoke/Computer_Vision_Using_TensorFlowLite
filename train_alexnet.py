@@ -6,6 +6,7 @@
             @date: 4th December, 2017
             @author: Oluwole Oyetoke
             @Language: Python
+            @email: oluwoleoyetoke@gmail.com
 
           AlexNet NETWORK OVERVIEW
     AlexNet Structure: 60 million Parameters
@@ -212,7 +213,7 @@ def _plot_training_progress():
   
   #PLOT LOSS PER EPOCH
   loss_per_epoch_fig = plt.figure("LOSS PER EPOCH PLOT")
-  plt.plot(epoch_bank, losses_bank, 'ro')
+  plt.plot(epoch_bank, losses_bank, 'ro-')
   loss_per_epoch_fig.suptitle('LOSS LEVEL PER EPOCH')
   plt.xlabel('Epoch Count')
   plt.ylabel('Loss Value')
@@ -225,7 +226,7 @@ def _plot_training_progress():
 
   #PLOT ACCURACY PER EPOCH
   accuracy_per_epoch_fig = plt.figure("ACCURACY PER EPOCH PLOT")
-  plt.plot(epoch_bank, accuracy_bank, 'bo')
+  plt.plot(epoch_bank, accuracy_bank, 'bo-')
   accuracy_per_epoch_fig.suptitle('ACCURACY PERCENTAGE PER EPOCH')
   plt.xlabel('Epoch Count')
   plt.ylabel('Accuracy Percentage')
@@ -249,9 +250,9 @@ def main(unused_argv):
     perform_shuffle=False
     repeat_count=1
     dataset_batch_size=1024 #Chuncks picked in dataset per time
-    training_batch_size = np.int32(dataset_batch_size/32) #Chuncks processed by tf.estimator per time
+    training_batch_size = np.int32(dataset_batch_size/8) #Chuncks processed by tf.estimator per time
     epoch_count=0
-    overall_training_epochs=2
+    overall_training_epochs=60 #60 epochs in total
     
     start_time=time.time() #taking current time as starting time
     start_time_string = time.strftime("%H:%M:%S", time.gmtime(start_time))
@@ -259,7 +260,7 @@ def main(unused_argv):
     #LOAD TRAINING DATA
     print("LOADING DATASET\n\n")
     filenames = ["/home/olu/Dev/data_base/sign_base/output/TFRecord_227x227/train-00000-of-00002", "/home/olu/Dev/data_base/sign_base/output/TFRecord_227x227/train-00001-of-00002"] #Directory path to the '.tfrecord' files
-    
+    model_dir="/home/olu/Dev/data_base/sign_base/output/Checkpoints_N_Model/trained_alexnet_model"
     #DETERMINE TOTAL NUMBER OF RECORDS IN THE '.tfrecord' FILES
     print("GETTING COUNT OF RECORDS/EXAMPLES IN DATASET")
     record_count = 0
@@ -267,16 +268,23 @@ def main(unused_argv):
       for record in tf.python_io.tf_record_iterator(fn):
          record_count += 1
     print("Total number of records in the .tfrecord file(s): %i\n\n" % record_count)
-    
+    no_of_rounds = int(math.ceil(record_count/dataset_batch_size));
 
+
+    #EDIT HOW OFTEN CHECK POINTS SHOULD BE SAVED
+    check_point_interval = int(record_count/training_batch_size)
+    my_estimator_config = tf.estimator.RunConfig(model_dir=model_dir,tf_random_seed=None,save_summary_steps=100,
+                                                 save_checkpoints_steps=check_point_interval,save_checkpoints_secs=None,session_config=None,keep_checkpoint_max=10,keep_checkpoint_every_n_hours=10000,log_step_count_steps=100)
+    
     print("CREATING ESTIMATOR AND LOADING DATASET")
     #CREATE ESTIMATOR
     """Estimator: a TensorFlow class for performing high-level model training, evaluation, and inference"""
-    traffic_sign_classifier = tf.estimator.Estimator(model_fn=cnn_model_fn, model_dir="/home/olu/Dev/data_base/sign_base/output/Checkpoints_N_Model/trained_alexnet_model") #SPECIFY where the finally trained model and (checkpoints during training) should be saved in
+    traffic_sign_classifier = tf.estimator.Estimator(model_fn=cnn_model_fn, model_dir=model_dir, config=my_estimator_config) #specify where the finally trained model and (checkpoints during training) should be saved in
 
     #SET-UP LOGGIN FOR PREDICTIONS
     tensors_to_log = {"probabilities": "softmax_tensor"}
     logging_hook = tf.train.LoggingTensorHook(tensors=tensors_to_log, every_n_iter=50) #Log after every 50 itterations
+
 
     #PROCESS AND RETREIVE DATASET CONTENT IN BATCHES OF 'dataset_batch_size'
     dataset = tf.data.TFRecordDataset(filenames=filenames)
@@ -286,7 +294,7 @@ def main(unused_argv):
     dataset = dataset.batch(dataset_batch_size)                 #Batch size to use to pick from dataset
     iterator = dataset.make_initializable_iterator()            #Create iterator which helps to get all iamges in the dataset
     labels_tensor, images_tensor = iterator.get_next()          #Get batch data
-    no_of_rounds = int(math.ceil(record_count/dataset_batch_size));
+    
 
     #CREATE TF SESSION TO ITTERATIVELY EVALUATE THE BATCHES OF DATASET TENSORS RETREIVED AND PASS THEM TO ESTIMATOR FOR TRAINING/EVALUATION
     sess = tf.Session()
@@ -321,14 +329,28 @@ def main(unused_argv):
           #mean normalization - normalize current batch of images i.e get mean of images in dataset and subtact it from all image intensities in the dataset
           dataset_image_mean = np.mean(squeezed_image_np_array)
           normalized_image_dataset = np.subtract(squeezed_image_np_array, dataset_image_mean) #help for faster convergence duing training
-          #Split data into training and testing/evaluation data
+          #split data into training and testing/evaluation data
           image_train, image_evaluate, label_train, label_evaluate = train_test_split(normalized_image_dataset, squeezed_label_np_array, test_size=0.05, random_state=42, shuffle=True) #5% of dataset will be used for evaluation/testing
-          normalized_image_dataset.astype(np.float32) #should be image_train
+          #rectify dimension/shape
+          if (image_evaluate.ndim<4): #if dimension is just 3 i.e only 1 image loaded
+              print(image_evaluate.shape)
+              image_evaluate = image_evaluate.reshape((1,) + image_evaluate.shape)
+          if (image_train.ndim<4): #if dimension is just 3 i.e only 1 image loaded
+              print(image_train.shape)
+              image_train = image_train.reshape((1,) + image_train.shape)
+          #rectify precision
+          image_train.astype(np.float32)
+          image_evaluate.astype(np.float32)
           #Store evaluation data in its place
-          complete_evaluation_image_set = np.append(complete_evaluation_image_set, image_evaluate)
+          if(strides_count==1):
+            complete_evaluation_image_set = image_evaluate
+          else:
+            complete_evaluation_image_set = np.concatenate((complete_evaluation_image_set.squeeze(), image_evaluate))
           complete_evaluation_label_set = np.append(complete_evaluation_label_set, label_evaluate)
+          complete_evaluation_label_set = complete_evaluation_label_set.squeeze()
+          
           #Feed current batch of training images to TF Estimator for training. TF Estimator deals with them in batches of 'batch_size=32'
-          train_input_fn = tf.estimator.inputs.numpy_input_fn(x={"x": normalized_image_dataset},y=squeezed_label_np_array,batch_size=training_batch_size,num_epochs=1, shuffle=True) #Note, images have already been shuffled when placed in the TFRecord, shuffled again when being retreived from the record & will be shuffled again when being sent to the classifier
+          train_input_fn = tf.estimator.inputs.numpy_input_fn(x={"x": image_train},y=label_train,batch_size=training_batch_size,num_epochs=1, shuffle=True) #Note, images have already been shuffled when placed in the TFRecord, shuffled again when being retreived from the record & will be shuffled again when being sent to the classifier
           traffic_sign_classifier.train(input_fn=train_input_fn,hooks=[logging_hook])
         except tf.errors.OutOfRangeError:
           print("End of Dataset Reached")
@@ -339,10 +361,8 @@ def main(unused_argv):
       """Once trainingis completed, we then proceed to evaluate the accuracy level of our trained model
       To create eval_input_fn, we set num_epochs=1, so that the model evaluates the metrics over one epoch of
       data and returns the result. We also set shuffle=False to iterate through the data sequentially."""
-      #eval_input_fn = tf.estimator.inputs.numpy_input_fn(x={"x": complete_evaluation_image_set},y=complete_evaluation_label_set,num_epochs=1,shuffle=False)
+      eval_input_fn = tf.estimator.inputs.numpy_input_fn(x={"x": complete_evaluation_image_set},y=complete_evaluation_label_set,num_epochs=1,shuffle=False)
       evaluation_result = traffic_sign_classifier.evaluate(input_fn=eval_input_fn) #Get dictionary of loss, global step size and accuracy e.g {'loss': 1.704558, 'accuracyy': 0.58105469, 'global_step': 742}
-      print("Captured Loss (%f), Accuracy(%f), Steps(%i)\n"%(epoch_loss,epoch_accuracy,epoch_steps))
-      print(evaluation_result)
 
       #PLOT TRAINING PERFORMANCE
       epoch_loss = evaluation_result.get('loss')
@@ -351,8 +371,12 @@ def main(unused_argv):
       losses_bank = np.append(losses_bank, epoch_loss)
       accuracy_bank = np.append(accuracy_bank, (epoch_accuracy*100))
       steps_bank = np.append(steps_bank, epoch_steps)
-      epoch_bank = np.append(epoch_bank, strides_count)
-      #_plot_training_progress()
+      epoch_bank = np.append(epoch_bank, epoch_count)
+      _plot_training_progress()
+
+      accuracy_percentage = epoch_accuracy*100
+      print("Network Performance Analysis: Loss(%f), Accuracy(%f percent), Steps(%i)\n"%(epoch_loss,accuracy_percentage,epoch_steps))
+      #print(evaluation_result)
 
       #PRINT EPOCH OPERATION TIME
       epoch_end_time=time.time() #taking current time as ending time
@@ -364,6 +388,7 @@ def main(unused_argv):
     sess.close()
 
     #SAVE FINAL MODEL
+    #Not really Needed, because TF Estimator saves the end of evey epoch
     
 
     
@@ -373,13 +398,8 @@ def main(unused_argv):
     end_time_string = time.strftime("%H:%M:%S", time.gmtime(end_time))
     elapsed_time_string = time.strftime("%H:%M:%S", time.gmtime(elapsed_time))
     print("END OF TRAINING..... ENDED @ %s" %end_time_string)
-    print("TIME TAKEN FOR ENTIRE TRAINING %s" %elapsed_time_string)
-
-    #TO-DO
-    #SAVE FINAL MODEL SPECIALLY
-    #ADJUST SAVER FREQUENCY FOR ESTIMATOR
-    #TEST EVALUATION FROM ONE OF THE CHECK POINTS (Load model & feed image to it)
-    #RECTIFY IMAGE_TRAIN vs NORMALIZED_IMAGE_DATASET
+    print("Final Trained Model is Saved Here: %s" %  model_dir)
+    print("TIME TAKEN FOR ENTIRE TRAINING %s" % elapsed_time_string)
     
 """----------------------------------------------------------------------------------------------------------------------------------------------------------------"""
 
