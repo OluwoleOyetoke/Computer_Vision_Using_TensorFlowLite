@@ -57,7 +57,7 @@ accuracy_bank = np.array([]) #global
 steps_bank = np.array([]) #global
 epoch_bank = np.array([]) #global
 
-tf.logging.set_verbosity(tf.logging.INFO) #setting up logging (can be DEBUG, ERROR, FATAL, INFO or WARN)
+tf.logging.set_verbosity(tf.logging.WARN) #setting up logging (can be DEBUG, ERROR, FATAL, INFO or WARN)
 """----------------------------------------------------------------------------------------------------------------------------------------------------------------"""
 
 
@@ -82,7 +82,7 @@ def _bytes_feature(value):
 def cnn_model_fn(features, labels, mode):
 
     """INPUT LAYER"""
-    input_layer = tf.reshape(features["x"], [-1, FLAGS.image_width, FLAGS.image_height, FLAGS.image_channels]) #Alexnet uses 227x227x3 input layer. '-1' means pick batch size randomly
+    input_layer = tf.reshape(features["x"], [-1, FLAGS.image_width, FLAGS.image_height, FLAGS.image_channels], name="input_layer") #Alexnet uses 227x227x3 input layer. '-1' means pick batch size randomly
     #print(input_layer)
 
     """%FIRST CONVOLUTION BLOCK
@@ -136,7 +136,7 @@ def cnn_model_fn(features, labels, mode):
 
     #FULLY CONNECTED LAYER 3
     """since the output from above is [1x1x4096]"""
-    logits = tf.layers.dense(inputs=fc2, units=FLAGS.num_of_classes)
+    logits = tf.layers.dense(inputs=fc2, units=FLAGS.num_of_classes, name="logits_layer")
     #fc3 = tf.layers.conv2d(inputs=fc2, filters=43, kernel_size=[1, 1], strides=1, padding="valid")
     #logits = tf.layers.dense(inputs=fc3, units=FLAGS.num_of_classes) #converting the convolutional block (tf.layers.conv2d) to a dense layer (tf.layers.dense). Only needed if we had used tf.layers.conv2d to represent the FCLs
     #print(logits)
@@ -149,10 +149,11 @@ def cnn_model_fn(features, labels, mode):
     tf.nn.softmax(logits, name="softmax_tensor"): Generate the probability distribution
     """
     predictions = {
-      "classes": tf.argmax(input=logits, axis=1),
+      "classes": tf.argmax(input=logits, axis=1, name="classes_tensor"),
       "probabilities": tf.nn.softmax(logits, name="softmax_tensor")
       }
-
+    c= tf.argmax(input=logits, axis=1)
+    print(c.name)
     #Return result if we were in prediction mode and not training
     if mode == tf.estimator.ModeKeys.PREDICT:
         return tf.estimator.EstimatorSpec(mode=mode, predictions=predictions)
@@ -170,8 +171,10 @@ def cnn_model_fn(features, labels, mode):
     training. We'll use a learning rate of 0.001 and stochastic gradient descent
     as the optimization algorithm:"""
     if mode == tf.estimator.ModeKeys.TRAIN:
-        optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.00005) #Very small learning rate used. Training will be slower at converging by better
-        train_op = optimizer.minimize(loss=loss,global_step=tf.train.get_global_step())
+        optimizer = tf.train.AdamOptimizer(learning_rate=0.00001)
+        train_op = optimizer.minimize(loss)
+        #optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.00005) #Very small learning rate used. Training will be slower at converging by better
+        #train_op = optimizer.minimize(loss=loss,global_step=tf.train.get_global_step())
         return tf.estimator.EstimatorSpec(mode=mode, loss=loss, train_op=train_op)
     
     #ADD EVALUATION METRICS
@@ -330,7 +333,7 @@ def main(unused_argv):
           dataset_image_mean = np.mean(squeezed_image_np_array)
           normalized_image_dataset = np.subtract(squeezed_image_np_array, dataset_image_mean) #help for faster convergence duing training
           #split data into training and testing/evaluation data
-          image_train, image_evaluate, label_train, label_evaluate = train_test_split(normalized_image_dataset, squeezed_label_np_array, test_size=0.05, random_state=42, shuffle=True) #5% of dataset will be used for evaluation/testing
+          image_train, image_evaluate, label_train, label_evaluate = train_test_split(normalized_image_dataset, squeezed_label_np_array, test_size=0.10, random_state=42, shuffle=True) #5% of dataset will be used for evaluation/testing
           #rectify dimension/shape
           if (image_evaluate.ndim<4): #if dimension is just 3 i.e only 1 image loaded
               print(image_evaluate.shape)
@@ -348,7 +351,6 @@ def main(unused_argv):
             complete_evaluation_image_set = np.concatenate((complete_evaluation_image_set.squeeze(), image_evaluate))
           complete_evaluation_label_set = np.append(complete_evaluation_label_set, label_evaluate)
           complete_evaluation_label_set = complete_evaluation_label_set.squeeze()
-          
           #Feed current batch of training images to TF Estimator for training. TF Estimator deals with them in batches of 'batch_size=32'
           train_input_fn = tf.estimator.inputs.numpy_input_fn(x={"x": image_train},y=label_train,batch_size=training_batch_size,num_epochs=1, shuffle=True) #Note, images have already been shuffled when placed in the TFRecord, shuffled again when being retreived from the record & will be shuffled again when being sent to the classifier
           traffic_sign_classifier.train(input_fn=train_input_fn,hooks=[logging_hook])
