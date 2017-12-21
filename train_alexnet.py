@@ -75,8 +75,6 @@ def _bytes_feature(value):
 """----------------------------------------------------------------------------------------------------------------------------------------------------------------"""
 
 
-
-
 #CREATE CNN STRUCTURE
 """----------------------------------------------------------------------------------------------------------------------------------------------------------------"""
 def cnn_model_fn(features, labels, mode):
@@ -152,8 +150,7 @@ def cnn_model_fn(features, labels, mode):
       "classes": tf.argmax(input=logits, axis=1, name="classes_tensor"),
       "probabilities": tf.nn.softmax(logits, name="softmax_tensor")
       }
-    c= tf.argmax(input=logits, axis=1)
-    print(c.name)
+   
     #Return result if we were in prediction mode and not training
     if mode == tf.estimator.ModeKeys.PREDICT:
         return tf.estimator.EstimatorSpec(mode=mode, predictions=predictions)
@@ -163,7 +160,7 @@ def cnn_model_fn(features, labels, mode):
     model's predictions match the target classes. For multiclass classification, cross entropy is typically used as the loss metric."""
     onehot_labels = tf.one_hot(indices=tf.cast(labels, tf.int32), depth=FLAGS.num_of_classes)
     loss = tf.losses.softmax_cross_entropy(onehot_labels=onehot_labels, logits=logits)
-
+    tf.summary.scalar('My_Loss_Record', loss) #Just to see loss values per epoch (testing tensor board)
     
     #CONFIGURE TRAINING
     """Since the loss of the CNN is the softmax cross-entropy of the fc3 layer
@@ -172,7 +169,7 @@ def cnn_model_fn(features, labels, mode):
     as the optimization algorithm:"""
     if mode == tf.estimator.ModeKeys.TRAIN:
         optimizer = tf.train.AdamOptimizer(learning_rate=0.00001)
-        train_op = optimizer.minimize(loss)
+        train_op = optimizer.minimize(loss, global_step=tf.train.get_global_step()) #global_Step needed for proper graph on tensor board
         #optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.00005) #Very small learning rate used. Training will be slower at converging by better
         #train_op = optimizer.minimize(loss=loss,global_step=tf.train.get_global_step())
         return tf.estimator.EstimatorSpec(mode=mode, loss=loss, train_op=train_op)
@@ -252,7 +249,7 @@ def main(unused_argv):
 
     perform_shuffle=False
     repeat_count=1
-    dataset_batch_size=1024 #Chuncks picked in dataset per time
+    dataset_batch_size=128 #1024 #Chuncks picked in dataset per time
     training_batch_size = np.int32(dataset_batch_size/8) #Chuncks processed by tf.estimator per time
     epoch_count=0
     overall_training_epochs=60 #60 epochs in total
@@ -354,6 +351,8 @@ def main(unused_argv):
           #Feed current batch of training images to TF Estimator for training. TF Estimator deals with them in batches of 'batch_size=32'
           train_input_fn = tf.estimator.inputs.numpy_input_fn(x={"x": image_train},y=label_train,batch_size=training_batch_size,num_epochs=1, shuffle=True) #Note, images have already been shuffled when placed in the TFRecord, shuffled again when being retreived from the record & will be shuffled again when being sent to the classifier
           traffic_sign_classifier.train(input_fn=train_input_fn,hooks=[logging_hook])
+          if (strides_count==5):
+            break
         except tf.errors.OutOfRangeError:
           print("End of Dataset Reached")
           break
@@ -402,6 +401,7 @@ def main(unused_argv):
     print("END OF TRAINING..... ENDED @ %s" %end_time_string)
     print("Final Trained Model is Saved Here: %s" %  model_dir)
     print("TIME TAKEN FOR ENTIRE TRAINING %s" % elapsed_time_string)
+    summary_writer.flush()
     
 """----------------------------------------------------------------------------------------------------------------------------------------------------------------"""
 
