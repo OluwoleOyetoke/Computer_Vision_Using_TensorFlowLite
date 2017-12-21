@@ -401,7 +401,6 @@ def main(unused_argv):
     print("END OF TRAINING..... ENDED @ %s" %end_time_string)
     print("Final Trained Model is Saved Here: %s" %  model_dir)
     print("TIME TAKEN FOR ENTIRE TRAINING %s" % elapsed_time_string)
-    summary_writer.flush()
     
 """----------------------------------------------------------------------------------------------------------------------------------------------------------------"""
 
