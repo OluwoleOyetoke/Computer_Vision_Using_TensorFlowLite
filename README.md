@@ -23,13 +23,13 @@ With TensorFlow, we can store our whole dataset and all of its meta-data as a se
 
 ### Step 5: Create AlexNet Structure
 The script **train_alexnet.py** is used to create and train the CNN. See TensorBoard visualization of AlexNet structure
-![Network Visualization] (https://github.com/OluwoleOyetoke/Computer_Vision_Using_TensorFlowLite/blob/master/imgs/network_visualization.png)
+![Network Visualization] (https://github.com/OluwoleOyetoke/Computer_Vision_Using_TensorFlowLite/blob/master/imgs/network_visualization.png?raw=true)
 
 
 ### Step 6: Train CNN using TFRecord data
 The figures below show the drop in loss of the network as training happened. The Adam Optimizer was used.
-![Loss Per Epoch] (https://github.com/OluwoleOyetoke/Computer_Vision_Using_TensorFlowLite/blob/master/imgs/loss_per_epoch.png)
-![Accuracy Per Epoch] (https://github.com/OluwoleOyetoke/Computer_Vision_Using_TensorFlowLite/blob/master/imgs/accuracy_per_epoch.png)
+![Loss Per Epoch] (https://github.com/OluwoleOyetoke/Computer_Vision_Using_TensorFlowLite/blob/master/imgs/loss_per_epoch.png?raw=true)
+![Accuracy Per Epoch] (https://github.com/OluwoleOyetoke/Computer_Vision_Using_TensorFlowLite/blob/master/imgs/accuracy_per_epoch.png?raw=true)
 
 ### Step 7: Test & evaluate trained model
 To test the trained network model, the script **classify_img_arg.py** can be used.
