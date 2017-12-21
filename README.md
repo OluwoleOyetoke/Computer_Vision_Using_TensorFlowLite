@@ -1,19 +1,17 @@
 # Computer_Vision_Using_TensorFlowLite
 
-On this project the AlexNet Convolution Neural Network is trained using traffic sign images from the German Road Traffic Sign Benchmark.
-The initially trained network is then quantized/optimized for deployment on mobile devices using TensorFlowLite 
+On this project the AlexNet Convolutional Neural Network is trained using traffic sign images from the German Road Traffic Sign Benchmark. The initially trained network is then quantized/optimized for deployment on mobile devices using TensorFlowLite 
 
 ## Project Steps
-
-1. Download German Traffic Sign Benchmark training images [from here](http://benchmark.ini.rub.de/Dataset/GTSRB_Final_Training_Images.zip)
-2. Convert from .ppm to .jpg format
-3. Label db folder appropriately
-4. Convert dataset to TFRecord
+1. Download German Traffic Sign Benchmark Training Images [from here](http://benchmark.ini.rub.de/Dataset/GTSRB_Final_Training_Images.zip)
+2. Convert From .ppm to .jpg Format
+3. Label db Folder Appropriately
+4. Convert Dataset to TFRecord
 5. Create CNN (alexnet)
-6. Train CNN using TFRecord data
-7. Test & evaluate trained model
+6. Train CNN Using TFRecord Data
+7. Test & Evaluate Trained Model
 8. Quantize/Tune/Optimize trained model for mobile deployment
-9. Test & evaluate tuned model
+9. Test & Evaluate Tuned Model
 
 ### Steps 1, 2 & 3: Get Dataset, Convert from .ppm to .jpeg & Label Appropriately
 The **DatasetConverter** folder contains the java program written to go through the GTSBR dataset, rename all its folders using the class name of the sets of images the folders contain. It also converts the image file types from .ppm to .jpeg
@@ -30,7 +28,7 @@ The script **train_alexnet.py** is used to create and train the CNN. See TensorB
 **Figure Showing TesnorBoard Visualization of the Network**
 
 
-### Step 6: Train CNN using TFRecord data
+### Step 6: Train CNN Using TFRecord Data
 The figures below show the drop in loss of the network as training progressed. The Adam Optimizer was used. The Figure below shows the loss reducing per epoch
 ![Loss Per Epoch](https://github.com/OluwoleOyetoke/Computer_Vision_Using_TensorFlowLite/blob/master/imgs/accuracy_per_epoch.png)
 
@@ -38,7 +36,7 @@ The figures below show the drop in loss of the network as training progressed. T
 
 After the full training proceedure, the network performance improved to **over 98% accuracy**
 
-### Step 7: Test & evaluate trained model
+### Step 7: Test & Evaluate Trained Model
 To test the trained network model, the script **classify_img_arg.py** can be used.
 Usage format:
 
