@@ -37,3 +37,4 @@ Usage format:
 '''
 $python one_time_classify.py [saved_model_directory] [path_to_image]
 '''
+![Project Milestones](https://github.com/OluwoleOyetoke/Deep-Learning-Assisted-Computer-Vision-System/blob/master/Project%20Documentation/Img/Project%20Milestone.PNG
