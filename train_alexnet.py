@@ -37,13 +37,15 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 from sklearn.model_selection import train_test_split
+from dateutil.relativedelta import relativedelta
 
 import os
 import math
 import time
 import numpy as np
 import tensorflow as tf #import tensorflow
-import matplotlib.pyplot as plt 
+import matplotlib.pyplot as plt
+import datetime
 
 flags = tf.app.flags
 flags.DEFINE_integer("image_width", "227", "Alexnet input layer width")
@@ -160,7 +162,7 @@ def cnn_model_fn(features, labels, mode):
     model's predictions match the target classes. For multiclass classification, cross entropy is typically used as the loss metric."""
     onehot_labels = tf.one_hot(indices=tf.cast(labels, tf.int32), depth=FLAGS.num_of_classes)
     loss = tf.losses.softmax_cross_entropy(onehot_labels=onehot_labels, logits=logits)
-    tf.summary.scalar('My_Loss_Record', loss) #Just to see loss values per epoch (testing tensor board)
+    tf.summary.scalar('Loss Per Stride', loss) #Just to see loss values per epoch (testing tensor board)
     
     #CONFIGURE TRAINING
     """Since the loss of the CNN is the softmax cross-entropy of the fc3 layer
@@ -249,13 +251,14 @@ def main(unused_argv):
 
     perform_shuffle=False
     repeat_count=1
-    dataset_batch_size=128 #1024 #Chuncks picked in dataset per time
+    dataset_batch_size=1024 #1024 #Chuncks picked in dataset per time
     training_batch_size = np.int32(dataset_batch_size/8) #Chuncks processed by tf.estimator per time
     epoch_count=0
     overall_training_epochs=60 #60 epochs in total
-    
+
     start_time=time.time() #taking current time as starting time
-    start_time_string = time.strftime("%H:%M:%S", time.gmtime(start_time))
+    start_time_string = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(start_time))
+    start_time_dt = datetime.datetime.strptime(start_time_string, '%Y-%m-%d %H:%M:%S')
     print("STARTED @ %s" % start_time_string)
     #LOAD TRAINING DATA
     print("LOADING DATASET\n\n")
@@ -303,7 +306,8 @@ def main(unused_argv):
     
     for _ in range(overall_training_epochs):
       epoch_start_time=time.time() #taking current time as starting time
-      epoch_start_time_string = time.strftime("%H:%M:%S", time.gmtime(epoch_start_time))
+      epoch_start_time_string = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(epoch_start_time))
+      epoch_start_time_dt = datetime.datetime.strptime(epoch_start_time_string, '%Y-%m-%d %H:%M:%S')
       epoch_count=epoch_count+1;
       print("Epoch %i out of %i" % (epoch_count, overall_training_epochs))
       print("Note: Each complete epoch processes %i images, feeding it into the classifier in batches of %i" % (record_count, dataset_batch_size))
@@ -351,8 +355,6 @@ def main(unused_argv):
           #Feed current batch of training images to TF Estimator for training. TF Estimator deals with them in batches of 'batch_size=32'
           train_input_fn = tf.estimator.inputs.numpy_input_fn(x={"x": image_train},y=label_train,batch_size=training_batch_size,num_epochs=1, shuffle=True) #Note, images have already been shuffled when placed in the TFRecord, shuffled again when being retreived from the record & will be shuffled again when being sent to the classifier
           traffic_sign_classifier.train(input_fn=train_input_fn,hooks=[logging_hook])
-          if (strides_count==5):
-            break
         except tf.errors.OutOfRangeError:
           print("End of Dataset Reached")
           break
@@ -381,26 +383,27 @@ def main(unused_argv):
 
       #PRINT EPOCH OPERATION TIME
       epoch_end_time=time.time() #taking current time as ending time
-      epoch_elapsed_time = epoch_end_time-epoch_start_time
-      epoch_elapsed_time_string = time.strftime("%H:%M:%S", time.gmtime(epoch_elapsed_time))
-      training_elapsed_time_sofar = epoch_end_time - start_time
-      training_elapsed_time_sofar_string = time.strftime("%H:%M:%S", time.gmtime(training_elapsed_time_sofar))
-      print("End of epoch %i.\n Time taken for this epoch: %s\n Overall time taken so far on training %s\n\n\n" %(epoch_count, epoch_elapsed_time_string, training_elapsed_time_sofar_string))
+      epoch_end_time_string = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(epoch_end_time))
+      epoch_end_time_dt = datetime.datetime.strptime(epoch_end_time_string, '%Y-%m-%d %H:%M:%S')
+      epoch_elapsed_time = relativedelta(epoch_end_time_dt, epoch_start_time_dt)
+      print("End of epoch %i.\n Time taken for this epoch: %d Day(s) : %d : Hour(s) : %d Minute(s) : %d Second(s)" %(epoch_count, epoch_elapsed_time.days, epoch_elapsed_time.hours, epoch_elapsed_time.minutes, epoch_elapsed_time.seconds))
+      training_elapsed_time_sofar = relativedelta(epoch_end_time_dt, start_time_dt)
+      print("Overall training time so far: %d Day(s) : %d : Hour(s) : %d Minute(s) : %d Second(s) \n\n\n" %(training_elapsed_time_sofar.days, training_elapsed_time_sofar.hours, training_elapsed_time_sofar.minutes, training_elapsed_time_sofar.seconds))
     sess.close()
 
     #SAVE FINAL MODEL
-    #Not really Needed, because TF Estimator saves the end of evey epoch
+    #Not really Needed, because TF Estimator saves .meta .data .ckpt at the end of evey epoch
     
 
     
     #PRINT TOTAL TRAINING TIME & END
     end_time=time.time() #taking current time as ending time
-    elapsed_time = end_time-start_time
-    end_time_string = time.strftime("%H:%M:%S", time.gmtime(end_time))
-    elapsed_time_string = time.strftime("%H:%M:%S", time.gmtime(elapsed_time))
+    end_time_string = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(end_time))
+    end_time_dt = datetime.datetime.strptime(end_time_string, '%Y-%m-%d %H:%M:%S')
+    elapsed_time_dt = relativedelta(end_time_dt, start_time_dt)
     print("END OF TRAINING..... ENDED @ %s" %end_time_string)
     print("Final Trained Model is Saved Here: %s" %  model_dir)
-    print("TIME TAKEN FOR ENTIRE TRAINING %s" % elapsed_time_string)
+    print("TIME TAKEN FOR ENTIRE TRAINING: %d Day(s) : %d : Hour(s) %d Minute(s) : %d Second(s)" % (elapsed_time_dt.days, elapsed_time_dt.hours, elapsed_time_dt.minutes, elapsed_time_dt.seconds))
     
 """----------------------------------------------------------------------------------------------------------------------------------------------------------------"""
 
