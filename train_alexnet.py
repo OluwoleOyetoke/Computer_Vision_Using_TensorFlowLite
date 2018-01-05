@@ -145,7 +145,7 @@ def cnn_model_fn(features, labels, mode):
     """convert these raw values into two different formats that our model function can return:
     The predicted class for each example: a digit from 1–43.
     The probabilities for each possible target class for each example
-    tf.argmax(input=fc3, axis=1: Generate predictions from the 43 last filters returned from the fc3
+    tf.argmax(input=fc3, axis=1: Generate predictions from the 43 last filters returned from the fc3. Axis 1 will apply argmax to the rows
     tf.nn.softmax(logits, name="softmax_tensor"): Generate the probability distribution
     """
     predictions = {
