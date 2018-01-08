@@ -51,7 +51,7 @@ To convert the Tensorflow .pb model to a TensorFlowLite .lite model, we will:
 1. Freeze the grpah i.e merge checkpoint values with graph stucture. In other words, load variables into the graph and convert them to constants
 2. Convert the frozen graph definition into the the [flat buffer format](https://google.github.io/flatbuffers/) (.lite)
 The TensorFlow graph optimization framework offers a suite of tools for modifying computational graphs.
-Code excerpt below from the [**freeze_and_convert_to_tflite.sh**](https://github.com/OluwoleOyetoke/Computer_Vision_Using_TensorFlowLite/blob/master/freeze_and_convert_to_tflite.sh) script shows how this .tflite conversion is achieved. 
+Code excerpt below from the [freeze_and_convert_to_tflite.sh](https://github.com/OluwoleOyetoke/Computer_Vision_Using_TensorFlowLite/blob/master/freeze_and_convert_to_tflite.sh) script shows how this .tflite conversion is achieved. 
 
 ```
 #FREEZE GRAPH
