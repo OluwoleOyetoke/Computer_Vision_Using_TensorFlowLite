@@ -45,3 +45,32 @@ Usage format:
 $python one_time_classify.py [saved_model_directory] [path_to_image]
 
 ```
+
+### Step 8: Quantize/Tune/Optimize Trained Model for Mobile Deployment
+To convert the Tensorflow .pb model to a TensorFlowLite .lite model, we will:
+1. Freeze the grpah i.e load variables into the graph and convert them to constants
+2. Convert the frozen graph definition into the the flat buffer format (.lite)
+The TensorFlow graph optimization framework offers a suite of tools for modifying computational graphs
+Code excerpt below from the [**freeze_and_convert_to_tflite.sh**](https://github.com/OluwoleOyetoke/Computer_Vision_Using_TensorFlowLite/blob/master/freeze_and_convert_to_tflite.sh) shows
+
+```
+#FREEZE GRAPH
+#bazel build tensorflow/python/tools:freeze_graph
+bazel-bin/tensorflow/python/tools/freeze_graph --input_graph=$1 --input_checkpoint=$2 --input_binary=$3 --output_graph=$4 --output_node_names=$6
+
+
+#VIEW SUMARY OF GRAPH
+#bazel build /tensorflow/tools/graph_transforms:summarize_graph
+bazel-bin/tensorflow/tools/graph_transforms/summarize_graph --in_graph=$4
+
+#OPTIMIZE GRAPH
+#bazel build tensorflow/tools/graph_transforms:transform_graph
+bazel-bin/tensorflow/tools/graph_transforms/transform_graph --in_graph=$4 --out_graph=${10} --inputs=$5 --outputs=$6 --transforms='strip_unused_nodes(type=float, shape="1,227,227,3") remove_nodes(op=Identity, op=CheckNumerics) fold_old_batch_norms fold_batch_norms'
+
+
+#CONVERT TO TFLITE MODEL
+#bazel build /tensorflow/contrib/lite/toco:toco
+bazel-bin/tensorflow/contrib/lite/toco/toco --input_format=TENSORFLOW_GRAPHDEF --input_file=${10} --output_format=TFLITE --output_file=$7 --inference_type=$9 --#input_type=$8 --input_arrays=$5 --output_arrays=$6 --inference_input_type=$8 --input_shapes=1,227,227,3
+
+
+```
