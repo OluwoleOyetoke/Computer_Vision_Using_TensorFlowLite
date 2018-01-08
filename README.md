@@ -12,6 +12,7 @@ On this project the AlexNet Convolutional Neural Network is trained using traffi
 7. Test & Evaluate Trained Model
 8. Quantize/Tune/Optimize trained model for mobile deployment
 9. Test & Evaluate Tuned Model
+10. Deploy Tuned Model to Mobile Platform [Here](https://github.com/OluwoleOyetoke/Accelerated-Android-Vision)
 
 ### Steps 1, 2 & 3: Get Dataset, Convert (from .ppm to .jpeg) & Label Appropriately
 The **DatasetConverter** folder contains the java program written to go through the GTSBR dataset, rename all its folders using the class name of the sets of images the folders contain. It also converts the image file types from .ppm to .jpeg
