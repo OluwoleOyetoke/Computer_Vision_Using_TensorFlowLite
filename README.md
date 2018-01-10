@@ -97,7 +97,7 @@ bazel-bin/tensorflow/tools/graph_transforms/summarize_graph --in_graph=$4
 
 #TRANSFORM/OPTIMIZE GRAPH
 bazel build tensorflow/tools/graph_transforms:transform_graph
-bazel-bin/tensorflow/tools/graph_transforms/transform_graph --in_graph=$4 --out_graph=${10} --inputs=$5 --outputs=$6 --transforms='strip_unused_nodes(type=float, shape="1,227,227,3") remove_nodes(op=Identity, op=CheckNumerics) fold_old_batch_norms fold_batch_norms'
+bazel-bin/tensorflow/tools/graph_transforms/transform_graph --in_graph=$4 --out_graph=${10} --inputs=$5 --outputs=$6 --transforms='strip_unused_nodes(type=float, shape="1,227,227,3") remove_nodes(op=Identity, op=CheckNumerics) fold_constants(ignore_errors=true) round_weights(num_steps=256) obfuscate_names sort_by_execution_order fold_old_batch_norms fold_batch_norms'
 
 
 #CONVERT TO TFLITE MODEL
