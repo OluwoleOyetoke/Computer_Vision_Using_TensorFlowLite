@@ -48,11 +48,39 @@ $python one_time_classify.py [saved_model_directory] [path_to_image]
 ```
 
 ### Step 8: Quantize/Tune/Optimize Trained Model for Mobile Deployment
-To convert the Tensorflow .pb model to a TensorFlowLite .lite model, we will:
+Here, the TensorFlow Graph Transform tool comes in handy in helping us shrink the size of the model and making it deployable on mobile. The transform tools are designed to work on models that are saved as GraphDef files, usually in a binary protobuf format. This is essentially the low-level definition of a TensorFlow computational graph, including a list of nodes and the input and output connections between them. But firstly before we start any form of transformation on the model, it is wise to freez the graph, thereby making sure that trained weights are fused with the graph, therefore converting the checkpoint values into embedded constants within the graph file itself. To do this, we will need to run the [tensorflow/python/tools/freeze_graph.py](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/python/tools/freeze_graph.py) script. The various transforms we can perform on our graph include striping unused nodes, removing unused nodes, folding batch norm layers etc.
+
+In a nutshell, to convert the Tensorflow .pb model to a TensorFlowLite .lite model, we will:
 1. Freeze the grpah i.e merge checkpoint values with graph stucture. In other words, load variables into the graph and convert them to constants
 2. Convert the frozen graph definition into the the [flat buffer format](https://google.github.io/flatbuffers/) (.lite)
-The TensorFlow graph optimization framework offers a suite of tools for modifying computational graphs.
+
+The various transforms we can perform on our graph include stiping unused nodes, remving unused nodes, folding batch norm layers etc.
+
+#### 8.1: Sample Transform Definition and A Little Bit of Explanation
+Note that these transform options are key to shrinking the model file size
+
+```
+transform = 'strip_unused_nodes(type=float, shape="1,299,299,3") 
+remove_nodes(op=Identity, op=CheckNumerics) 
+fold_constants(ignore_errors=true) 
+fold_batch_norms fold_old_batch_norms 
+round_weights(num_steps=256) 
+quantize_weights obfuscate_names 
+quantize_nodes sort_by_execution_order'
+```
+
+**round_weights(num_steps=256)** - This will help If you round the weights so that nearby numbers are stored as exactly the same values, the resulting bit stream has a lot more repetition and so compresses down a lot more effectively. Compressed tflite model can be as small as 70-% less the size of the original model. The nice thing about this transform option is that it doesn't change the structure of the graph at all, so it's running exactly the same operations and should have the same latency and memory usage as before. You can adjust the num_steps parameter to control how many values each weight buffer is rounded to, so lower numbers will increase the compression at the cost of accuracy
+
+**quantize_weights** - Storing the weights of the model as 8-bit will drastically reduce its size, however, we will be trading off accuracy.
+
+**obfuscate_names** - Supposing our graph has a lot of small nodes in it, the names can also end up being a cause of space utilization. Using this option will help cut that down.
+
+For some platforms it is very helpful to be able to do as many calculations as possible in eight-bit, rather than floating-point. a few transform option are available to help achieve this, although in most cases some modification will need to be made to the actual training code to make this transofrm happen effectively.
+
+#### 8.1: Execution
 Code excerpt below from the [freeze_and_convert_to_tflite.sh](https://github.com/OluwoleOyetoke/Computer_Vision_Using_TensorFlowLite/blob/master/freeze_and_convert_to_tflite.sh) script shows how this .tflite conversion is achieved. 
+
+As we know, TensorFlowLite is still in its early development stage and many new features are being added daily. Conversely, there are some TensorFlow operation which are not currently fully supported at the moment e.g [ArgMax](https://github.com/tensorflow/tensorflow/issues/15948). As a matter of fact, at the moment, [models that were quantized using transform_graph are not supported by TF Lite ](https://github.com/tensorflow/tensorflow/issues/15871#issuecomment-356419505). However, on the brighter note, we can still convert our TensorFlow custom model to a TFLite model, we will need to turn of some features such as quantize_weights, quantize_nodes and keep our model inference and input types as FLOATs. In this case, model size would not really change.
 
 ```
 #FREEZE GRAPH
