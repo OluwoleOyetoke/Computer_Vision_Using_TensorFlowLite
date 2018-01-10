@@ -63,7 +63,7 @@ The various transforms we can perform on our graph include stiping unused nodes,
 Note that these transform options are key to shrinking the model file size
 
 ```
-transform = 'strip_unused_nodes(type=float, shape="1,299,299,3") 
+transforms = 'strip_unused_nodes(type=float, shape="1,299,299,3") 
 remove_nodes(op=Identity, op=CheckNumerics) 
 fold_constants(ignore_errors=true) 
 fold_batch_norms fold_old_batch_norms 
