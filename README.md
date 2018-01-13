@@ -80,7 +80,7 @@ quantize_nodes sort_by_execution_order'
 
 For some platforms it is very helpful to be able to do as many calculations as possible in eight-bit, rather than floating-point. a few transform option are available to help achieve this, although in most cases some modification will need to be made to the actual training code to make this transofrm happen effectively.
 
-#### 8.1: Transformation & Conversion Execution
+#### 8.2: Transformation & Conversion Execution
 As we know, TensorFlowLite is still in its early development stage and many new features are being added daily. Conversely, there are some TensorFlow operation which are not currently fully supported at the moment [e.g ArgMax](https://github.com/tensorflow/tensorflow/issues/15948). As a matter of fact, at the moment, [models that were quantized using transform_graph are not supported by TF Lite ](https://github.com/tensorflow/tensorflow/issues/15871#issuecomment-356419505). However, on the brighter note, we can still convert our TensorFlow custom alexnet model to a TFLite model, but we will need to turn of some transform options such as 'quantize_weights', 'quantize_nodes' and keep our model inference, input types as FLOATs. In this case, model size would not really change.
 
 Code excerpt below from the [freeze_and_convert_to_tflite.sh](https://github.com/OluwoleOyetoke/Computer_Vision_Using_TensorFlowLite/blob/master/freeze_and_convert_to_tflite.sh) script shows how this .tflite conversion is achieved. 
