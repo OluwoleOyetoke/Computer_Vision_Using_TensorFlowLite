@@ -42,8 +42,11 @@ checkpoint_directory= sys.argv[1] # "/home/olu/Dev/data_base/sign_base/backup/Ch
 filename= sys.argv[2]             # "/home/olu/Dev/data_base/sign_base/training_227x227/road_closed/00002_00005.jpeg"
 
 #Process image to be sent to Neural Net
-im = np.array(Image.open(filename))
-img_batch = im.reshape(1, FLAGS.image_width, FLAGS.image_height,FLAGS.image_channels)
+img = Image.open(filename)
+img_resized = img.resize((227, 227), Image.ANTIALIAS)
+img_batch_np = np.array(img_resized)
+plt.imshow(img_batch_np)
+img_batch = img_batch_np.reshape(1, FLAGS.image_width, FLAGS.image_height,FLAGS.image_channels)
 
 #Declare categories/classes as string
 categories = ["speed_20", "speed_30","speed_50","speed_60","speed_70",
@@ -82,4 +85,5 @@ predicted_probabilities = sess.run(probabilities, feed_dict)
 assurance = predicted_probabilities[0,int(predicted_class)]*100;      
       
 print("Predicted Sign: '", categories[int(predicted_class)], "' With ", assurance," Percent Assurance")
+plt.show()
 """----------------------------------------------------------------------------------------------------------------------------------------------------------------"""

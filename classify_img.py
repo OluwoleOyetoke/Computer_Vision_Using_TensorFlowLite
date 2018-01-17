@@ -37,12 +37,18 @@ tf.logging.set_verbosity(tf.logging.WARN) #setting up logging (can be DEBUG, ERR
 def main(unused_argv):
 
   #Specify checkpoint & image directory
-  checkpoint_directory="/home/olu/Dev/data_base/sign_base/backup/Checkpoints_N_Model2-After_Epoch_20_copy/trained_alexnet_model"
+  checkpoint_directory="/home/olu/Dev/data_base/sign_base/backup/Checkpoints_N_Model_Epoch_34__copy/trained_alexnet_model"
   filename="/home/olu/Dev/data_base/sign_base/training_227x227/road_closed/00002_00005.jpeg"
 
   #Process image to be sent to Neural Net
-  im = np.array(Image.open(filename))
-  img_batch = im.reshape(1, FLAGS.image_width, FLAGS.image_height,FLAGS.image_channels)
+  #im = np.array(Image.open(filename))
+  #img_batch = im.reshape(1, FLAGS.image_width, FLAGS.image_height,FLAGS.image_channels)
+  
+  img = Image.open(filename)
+  img_resized = img.resize((227, 227), Image.ANTIALIAS)
+  img_batch_np = np.array(img_resized)
+  img_batch = img_batch_np.reshape(1, FLAGS.image_width, FLAGS.image_height,FLAGS.image_channels)
+  plt.imshow(img_batch_np)
 
   #Declare categories/classes as string
   categories = ["speed_20", "speed_30","speed_50","speed_60","speed_70",
@@ -75,14 +81,15 @@ def main(unused_argv):
   saver.restore(sess, checkpoint_file) #Load the weights saved using the restore method.
 
   probabilities = graph.get_tensor_by_name("softmax_tensor:0")
-  classes = graph.get_tensor_by_name("ArgMax:0") #'ArgMax:0' is the name of the argmax tensor in the train_alexnet.py file.
-  feed_dict = {"Reshape:0": img_batch} #'Reshape:0' is the name of the 'input_layer' tensor in the train_alexnet.py. Given to it as default.
+  classes = graph.get_tensor_by_name("classes_tensor:0") #'ArgMax:0' is the name of the argmax tensor in the train_alexnet.py file.
+  feed_dict = {"input_layer:0": img_batch} #'Reshape:0' is the name of the 'input_layer' tensor in the train_alexnet.py. Given to it as default.
   predicted_class = sess.run(classes, feed_dict)
   predicted_probabilities = sess.run(probabilities, feed_dict)
   assurance = predicted_probabilities[0,int(predicted_class)]*100;      
       
   print("Predicted Sign: ", categories[int(predicted_class)], " (With ", assurance," Percent Assurance)")
   print("finished")
+  plt.show()
 """----------------------------------------------------------------------------------------------------------------------------------------------------------------"""
 
 
