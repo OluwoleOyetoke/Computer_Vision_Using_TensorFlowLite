@@ -11,9 +11,7 @@ usage = $python classify_img_arg.py [saved_model_directory] [path_to_image]
 
 
 from __future__ import absolute_import
-from __future__ import division
 from __future__ import print_function
-from sklearn.model_selection import train_test_split
 
 import sys
 import os
@@ -41,13 +39,6 @@ tf.logging.set_verbosity(tf.logging.WARN) #setting up logging (can be DEBUG, ERR
 checkpoint_directory= sys.argv[1] # "/home/olu/Dev/data_base/sign_base/backup/Checkpoints_N_Model2-After_Epoch_20_copy/trained_alexnet_model"
 filename= sys.argv[2]             # "/home/olu/Dev/data_base/sign_base/training_227x227/road_closed/00002_00005.jpeg"
 
-#Process image to be sent to Neural Net
-img = Image.open(filename)
-img_resized = img.resize((227, 227), Image.ANTIALIAS)
-img_batch_np = np.array(img_resized)
-plt.imshow(img_batch_np)
-img_batch = img_batch_np.reshape(1, FLAGS.image_width, FLAGS.image_height,FLAGS.image_channels)
-
 #Declare categories/classes as string
 categories = ["speed_20", "speed_30","speed_50","speed_60","speed_70",
     "speed_80","speed_less_80","speed_100","speed_120",
@@ -65,25 +56,41 @@ categories = ["speed_20", "speed_30","speed_50","speed_60","speed_70",
     "traffic_circle","end_of_no_car_overtaking",
     "end_of_no_truck_overtaking"];
 
+print("resizing image.....")
+#Process image to be sent to Neural Net
+img = Image.open(filename)
+img_resized = img.resize((FLAGS.image_width, FLAGS.image_height), Image.ANTIALIAS)
+img_batch_np = np.array(img_resized)
+plt.imshow(img_batch_np)
+img_batch = img_batch_np.reshape(1, FLAGS.image_width, FLAGS.image_height,FLAGS.image_channels)
 
+print("loading network graph.....")
 #Recreate network graph.  
 sess = tf.Session()
-saver = tf.train.import_meta_graph(checkpoint_directory+'/model.ckpt-0.meta') #At this step only graph is created.
+latest_checkpoint_name = tf.train.latest_checkpoint(checkpoint_dir=checkpoint_directory)
+saver = tf.train.import_meta_graph(latest_checkpoint_name+'.meta') #At this step only graph is created.
     
 #Accessing the default graph which we have restored
 graph = tf.get_default_graph()
 
+print("loading network weights.....")
 #Get model's graph
 checkpoint_file=tf.train.latest_checkpoint(checkpoint_directory)
 saver.restore(sess, checkpoint_file) #Load the weights saved using the restore method.
 
+print("classification process started.....")
+start = time.time()
 probabilities = graph.get_tensor_by_name("softmax_tensor:0")
 classes = graph.get_tensor_by_name("ArgMax:0") #'ArgMax:0' is the name of the argmax tensor in the train_alexnet.py file.
 feed_dict = {"Reshape:0": img_batch} #'Reshape:0' is the name of the 'input_layer' tensor in the train_alexnet.py. Given to it as default.
 predicted_class = sess.run(classes, feed_dict)
 predicted_probabilities = sess.run(probabilities, feed_dict)
-assurance = predicted_probabilities[0,int(predicted_class)]*100;      
-      
+assurance = predicted_probabilities[0,int(predicted_class)]*100;
+end = time.time()
+difference = end-start
+difference_milli = difference*1000
+
 print("Predicted Sign: '", categories[int(predicted_class)], "' With ", assurance," Percent Assurance")
+print("Time Taken For Classification: %f millisecond(s)" % difference_milli)
 plt.show()
 """----------------------------------------------------------------------------------------------------------------------------------------------------------------"""

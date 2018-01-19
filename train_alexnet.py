@@ -162,7 +162,7 @@ def cnn_model_fn(features, labels, mode):
     model's predictions match the target classes. For multiclass classification, cross entropy is typically used as the loss metric."""
     onehot_labels = tf.one_hot(indices=tf.cast(labels, tf.int32), depth=FLAGS.num_of_classes)
     loss = tf.losses.softmax_cross_entropy(onehot_labels=onehot_labels, logits=logits)
-    tf.summary.scalar('Loss Per Stride', loss) #Just to see loss values per epoch (testing tensor board)
+    tf.summary.scalar('Loss Per Stride', loss) #Just to see loss values per batch on tensorboard
     
     #CONFIGURE TRAINING
     """Since the loss of the CNN is the softmax cross-entropy of the fc3 layer
